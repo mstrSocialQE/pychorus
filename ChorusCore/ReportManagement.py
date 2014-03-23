@@ -6,12 +6,13 @@ Created on Mar 1, 2014
 '''
 import os
 import ChorusGlobals
-from ChorusConstants import CommonConstants
+from ChorusConstants import CommonConstants, ResultStatus
 import Utils
 from jinja2 import Environment, PackageLoader
 import urllib2, json
 import datetime
 from collections import OrderedDict
+from PerformanceManagement import Performance_Result
 class ReportManagement:
     TEMPLATENAME = "Static"
     def __init__(self):
@@ -41,7 +42,7 @@ class ReportManagement:
                 suite_result.assertion_number += case_result.assertion_number
                 redundant_assertions = []
                 for assertion_name, assertion_result in case_result.assertions.items():
-                    if assertion_result.baseline_status and assertion_result.baseline and not assertion_result.current:
+                    if assertion_result.baseline_status and assertion_result.baseline and assertion_result.current==None:
                         redundant_assertions.append(assertion_name)
                 for assertion_name in redundant_assertions:
                     del case_result.assertions[assertion_name]
@@ -85,7 +86,33 @@ class ReportManagement:
         filename = os.path.join(self.output_path, 'Result.html')
         Utils.write_to_file(filename, content, "w+")
         self.logger.info("Result.html generated")
+    
+    def generate_performance_result(self):
+        env = Environment(loader=PackageLoader('ChorusCore', 'templates'))
+        performancetemplate = env.get_template("performance.html")
+        content = performancetemplate.render({"earesult":Performance_Result()})
+        filename = os.path.join(self.output_path, 'Performance.html')
+        Utils.write_to_file(filename, content, "w+")
+        self.logger.info("Performance.html generated")
         
+    def generate_console_report(self):
+        if self.result.statusflag:
+            self.logger.info("Total Test Result: %s" % self.result.status)
+        else:
+            self.logger.error("Total Test Result: %s" % self.result.status)
+        print "----------------------------"
+        for suite_name, suite_result in self.result.suites.items():
+            print "%s ----- %s" % (suite_name, suite_result.status)
+            if not suite_result.statusflag:
+                for case_name, case_result in suite_result.cases.items():
+                    if not case_result.statusflag:
+                        print "---Case: %s ----- %s" % (case_name, case_result.status)
+                        if case_result.fail_message:
+                            print "------Case Crash Message: %s" % str(case_result.fail_message)
+                            for assertion_name, assertion_result in case_result.assertions.items():
+                                if not assertion_result.statusflag:
+                                    print "------Assertion: %s ----- %s" % (assertion_name, assertion_result.status)   
+    
     def generate_html(self):
         self.analyze_result()
         self.copy_template()
@@ -108,7 +135,8 @@ class ReportManagement:
         self.logger.info("Summary.xml generated")
         if os.environ.has_key("BUILD_URL"):
             self.generate_result_email()
-        
+        if Performance_Result().data:    
+            self.generate_performance_result()
         
 class CIReport:
     def __init__(self):

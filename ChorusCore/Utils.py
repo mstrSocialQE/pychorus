@@ -93,14 +93,14 @@ def copy_folder(src, dst):
                 shutil.copy(src, dst)
             else: raise
 
-def read_config(config_filename,config_filepath):
+def read_config(config_file):
     '''Read cfg file'''
     cfg = ConfigParser.RawConfigParser()
-    print "Set config file to %s/%s" % (config_filepath,config_filename)
-    paths = config_filepath.split("/")
-    cfg.read(get_filestr(paths, config_filename))
+    cfg.read(config_file)
     if not cfg.sections():
-        raise Exception("Cannot read config info from %s at %s, please check you config filename and path!" % (config_filename,config_filepath))
+        raise Exception("Cannot read config info from %s at %s, please check you configfile!" % config_file)
+    else:
+        print "Set config file to %s" % config_file
     return cfg
 
 def get_timestamp():

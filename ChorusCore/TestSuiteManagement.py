@@ -62,8 +62,13 @@ class TestSuiteManagement:
             if self.result.suites[suite_result].status in [ResultStatus.PASSED, ResultStatus.KNOWN_ISSUES]:
                 self.result.passed_suites += 1
             elif self.result.suites[suite_result].status == ResultStatus.FAILED:
+                if self.result.status != ResultStatus.CRASHED:
+                    self.result.status = ResultStatus.FAILED
+                    self.result.statusflag = False
                 self.result.failed_suites += 1
             else:
+                self.result.status = ResultStatus.CRASHED
+                self.result.statusflag = False
                 self.result.crash_suites += 1
         
     def get_testsuites(self, sortflag=True):

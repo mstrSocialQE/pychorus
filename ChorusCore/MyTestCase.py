@@ -7,6 +7,7 @@ Created on Feb 23, 2014
 import unittest,time,json
 import Utils
 import ChorusGlobals
+from PerformanceManagement import Performance_Result
 from ChorusConstants import LEVELS, LOGIC, IMAGELOGIC, TYPES, ResultStatus, AssertionResult
 
 class MyTestCase(unittest.TestCase):
@@ -47,7 +48,7 @@ class MyTestCase(unittest.TestCase):
         assertion_result.baseline_status = True
         self.vm.checkpoint(self, name, data2, level = levels, cptype = TYPES.Data, logic = LOGIC.Equal)
     
-    def assertHTTPResponse(self, name, response, levels = LEVELS.Normal, logic = LOGIC.Equal):
+    def assertHTTPResponse(self, name, response, levels = LEVELS.Normal, logic = LOGIC.Equal, add_performance = True):
         assertion_result = self.init_assertions(name)
         try:
             api = json.dumps({
@@ -58,7 +59,8 @@ class MyTestCase(unittest.TestCase):
                                 "request_body":  response.body,
                                 "response_headers": response.response.headers,
                                 "response_body": response.response.data,
-                                "response_status": response.response.status
+                                "response_status": response.response.status,
+                                "time_taken": response.time_taken
                                 })
         except Exception,e:
             message = "Cannot transfer api info to json, please change it before assertion with error: %s" % str(e)
@@ -68,8 +70,10 @@ class MyTestCase(unittest.TestCase):
                                     "url":response.response.url,
                                     "api":api
                                     }
+        if add_performance:
+            Performance_Result().add(response.url, response.response.status, api, response.time_taken)
         self.vm.checkpoint(self, name, response.result, level = levels, cptype = TYPES.HTTPResponse, logic = logic)
-    
+
     def assertImageData(self, name, imagedata, levels = LEVELS.Normal, image_logic = IMAGELOGIC.Full, imagetype = "jpg"):
         self.vm.save_image(self, name, imagedata, imagetype)
         content = {
@@ -108,6 +112,7 @@ class MyTestCase(unittest.TestCase):
         super(MyTestCase,cls).setUpClass()
         cls.logger = ChorusGlobals.get_logger()
         cls.suite_name = Utils.get_current_classname(cls)
+        ChorusGlobals.set_current_suitename(cls.suite_name)
         from VerificationManagement import VerificationManagement
         cls.vm = VerificationManagement()
         cls.result = cls.vm.check_suitebaseline(cls.suite_name)

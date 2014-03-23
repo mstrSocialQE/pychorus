@@ -3,7 +3,7 @@ Created on May 13, 2013
 
 @author: mxu, modified by Anduril
 '''
-import httplib2, urllib, json
+import httplib2, urllib, json,time
 import Utils
 import copy,os
 import importlib
@@ -221,14 +221,17 @@ class Request:
             
                 
             http.follow_redirects=self.follow_redirects
+            starttime = time.time()
             resp, content = http.request(url,
                                      self.method.upper(),
                                      headers = self.headers,
                                      body = body                                 
                                      )
+            endtime = time.time()
+            self.time_taken = endtime-starttime
         except Exception, e:
-            self.logger.critical("Cannot connect %s" % (self.url,str(e)))
-            raise Exception("Cannot connect %s" % (self.url,str(e)))
+            self.logger.critical("Call %s exception %s:%s" % (self.url,str(Exception),str(e)))
+            raise Exception("Call %s exception %s:%s" % (self.url,str(Exception),str(e)))
             
         try:
             content_dict = Utils.get_dict_from_json(content)
