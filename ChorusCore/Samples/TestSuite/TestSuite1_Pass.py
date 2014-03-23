@@ -32,12 +32,26 @@ class TestSuite1_Pass(MyTestCase):
         
     @TestScope.setscope(TestScope.Scope.Sanity,TestScope.Scope.Regression)
     def testC01_pass(self):
-        '''Each test case must start with a "test" label'''
-        self.assertImageData("A01_Compare_Photo_With_Baseline", self.picdata1, image_logic=100, imagetype="png")
-        self.assertData("A01_Compare_Data_With_Baseline", {"data":"I like chorus"})
+        '''[Notice] Each test case must start with a "test" label
+           [author] Anduril
+           [Target] Show this function
+           [Pre-requisite] ~
+           [Expect Result] All Pass for case 1
+           [Step 1] assert a bool equal to True, compare with baseline
+           [Step 2] assert a dict data, compare with baseline
+           [Step 3] assert a image data, compare with baseline
+           [Step 4] use unittest assertion to assert a true, with a message claimed
+           [Step 5] use unittest assertion to compare two data
+           [Step 6] call an API and assert it, then compare with baseline
+        '''
         self.assertBool("A01_Compare_Bool", True)
+        self.assertData("A02_Compare_Data_With_Baseline", {"data":"I like chorus"})
+        self.assertImageData("A03_Compare_Photo_With_Baseline", self.picdata1, image_logic=100, imagetype="png")
         self.assertTrue(True, "Break_Message_for_unitteset_assertTrue")
         self.assertEqual("A01_data","A01_data","Break_Message_for_unittest_assertEqual")
+        from ChorusCore.APIManagement import Request
+        api = Request(url = "data/cityinfo/101010100.html", method = "get", base_url = "http://www.weather.com.cn").send()
+        self.assertHTTPResponse("A04_HttpCompare_With_Baseline", api)
         
     @TestScope.setscope(TestScope.Scope.Regression)
     def testC02_fail(self):

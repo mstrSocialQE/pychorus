@@ -258,3 +258,23 @@ def get_parameters(*args):
 def get_random_str(length = 16):
     import string
     return ''.join(random.sample(string.ascii_letters+string.digits,length))
+
+def extract_str(rawstr, start, end):
+    try:
+        temp1=rawstr.split(start)
+        temp2=temp1[1].split(end)
+        newstr=temp2[0]
+        return newstr
+    except Exception:
+        return ""
+    
+def parse_description(description):
+    desp = []
+    lines = description.split("\n")
+    for line in lines:
+        line = line.strip()
+        if line:
+            key = extract_str(line, "[", "]")
+            value = line[line.find("]")+1:].strip()
+            desp.append([key,value])
+    return desp

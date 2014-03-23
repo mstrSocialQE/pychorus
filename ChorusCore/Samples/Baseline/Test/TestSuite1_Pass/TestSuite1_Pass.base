@@ -1,25 +1,12 @@
 {
   "testC01_pass": {
     "A01_Compare_Bool": "True", 
-    "A01_Compare_Data_With_Baseline": {
+    "A02_Compare_Data_With_Baseline": {
       "data": "I like chorus"
     }, 
-    "A01_Compare_Photo_With_Baseline": {
+    "A03_Compare_Photo_With_Baseline": {
       "image_name": "testC01_pass_A01_Compare_Photo_With_Baseline", 
       "image_type": "png"
     }
-  }, 
-  "testC02_fail": {
-    "A01_Compare_Bool": "True", 
-    "A01_Compare_Data_With_Baseline": {
-      "data": "I like chorus"
-    }, 
-    "A01_Compare_Photo_With_Baseline": {
-      "image_name": "testC02_fail_A01_Compare_Photo_With_Baseline", 
-      "image_type": "png"
-    }
-  }, 
-  "testC04_crash": {
-    "A01_Compare_Bool": "True"
   }
 }

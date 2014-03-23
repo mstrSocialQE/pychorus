@@ -95,6 +95,10 @@
 	    <h1 id="banner">{{ result.name }}</h1>
 	    <div id="main">
 	        <div id="summary"> <!-- summary infos about test suite: including case number. passed, failed and crashed numbers -->
+	        	<h3>Description:</h3>
+	        	{% for line in result.description %}
+	        	<span><b>   {{line[0]}}</b>  <span>{{line[1]}}</span></span><br />
+	        	{% endfor %}
 	        	<h3>Case Total Number: <span class="green">{{ result.case_number }}</span> </h3>
 	        	<h3>Assertion Total Number: <span class="green">{{ result.assertion_number }}</span> </h3>
 	            <h3>Number of passed cases: <span class="green">{{ result.passed_cases }}</span> </h3>
@@ -158,12 +162,16 @@
 		                	</table>
 		                {% endif %}
 		                {% if not case_result.baseline_status %}
-		                	<span class="green"><b>New baseline generated for the case</b></span>
+		                	<span class="green"><b>New baseline generated for the case</b></span><br />
 		                {% endif %}
 		            </h3>
-		            <span class="stats">Passed assertions: <span class="green">{{ case_result.passed_assertions }}</span></span>
-		            <span class="stats">Failed assertions: <span class="red">{{ case_result.failed_assertions }}</span></span>
-                    <span class="stats">Time taken: <span class="green">{{ case_result.time_taken }}</span></span>
+		             	{% for line in case_result.description %}
+   						<span class="stats"><b>{{line[0]}}</b>  </span><span>{{line[1]}}</span><br />
+   						{% endfor %}
+   						<br />
+		            <span class="stats"><b>Passed assertions</b>: <span class="green">{{ case_result.passed_assertions }}</span></span>
+		            <span class="stats"><b>Failed assertions</b>: <span class="red">{{ case_result.failed_assertions }}</span></span>
+                    <span class="stats"><b>Time taken</b>: <span class="green">{{ case_result.time_taken }}</span></span>
                     {% for cp_name, cp in case_result.assertions.iteritems() %}
                     <div class="grid_6"> <!-- check point detail info -->
 		                <div class="box">
@@ -182,7 +190,7 @@
 		                            <ul>
 		                                <li>
 		                                	{% if not cp.baseline_status %}
-							                	<span class="green"><b>New baseline generated for the assertion</b></span>
+							                	<span class="green"><b>New baseline generated for the assertion</b></span><br />
 							                {% endif %}
 		                                    <table class="table">
 		                                    	{% if cp.comments and cp.status=="Passed with known issues" %}

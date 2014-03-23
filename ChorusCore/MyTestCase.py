@@ -116,6 +116,7 @@ class MyTestCase(unittest.TestCase):
         from VerificationManagement import VerificationManagement
         cls.vm = VerificationManagement()
         cls.result = cls.vm.check_suitebaseline(cls.suite_name)
+        cls.result.description = Utils.parse_description(cls.__doc__)
         cls.timestamp = Utils.get_timestamp()
         cls.config = ChorusGlobals.get_configinfo()
         cls.parameters = ChorusGlobals.get_parameters()
@@ -140,6 +141,7 @@ class MyTestCase(unittest.TestCase):
                 self.result.failed_cases += 1
             elif self.result.cases[self._testMethodName].status in [ResultStatus.PASSED, ResultStatus.KNOWN_ISSUES]:
                 self.result.passed_cases += 1
+            self.result.cases[self._testMethodName].description = Utils.parse_description(self._testMethodDoc)
         unittest.TestCase.tearDown(self)
         
     @classmethod
@@ -154,7 +156,18 @@ class MyTestCase(unittest.TestCase):
         cls.logserver.flush_console()
         cls.suite_endtime = time.time()
         cls.result.time_taken = cls.suite_endtime - cls.suite_starttime
-        
+    
+    def parse_description(self, description):
+        desp = []
+        lines = description.split("\n")
+        for line in lines:
+            line = line.strip()
+            if line:
+                key = Utils.extract_str(line, "[", "]")
+                value = line[line.find("]")+1:].strip()
+                desp.append([key,value])
+        return desp
+    
     def parse_unittest_assertionerror(self):
         try:
             error_message = self._resultForDoCleanups.failures[0][1]
