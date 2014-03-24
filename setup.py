@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
         name = "ChorusCore",
-        version = "0.9.014",
+        version = "0.9.016",
         description = "A test framework based on unittest, support baselines assertion, give pretty html report",
         author = "Anduril, mxu",
         author_email = "yjckralunr@gmail.com",
@@ -21,7 +21,8 @@ setup(
                                 'PIL>=1.1.7',
                                 'python-Levenshtein>=0.10.2'
                             ],
-        #scripts = ["scripts/chorusrun.py"],
-        entry_points = {"console_scripts":['chorusrun=ChorusCore.RunTest:main','chorussetup=ChorusCore.CreateSamples:main']},
+        entry_points = {"console_scripts":['chorusrun=ChorusCore.RunTest:main',
+                                           'chorussetup=ChorusCore.CreateSamples:main',
+                                           'chorusmodify=ChorusCore.RunTest:modify_config']},
         url = "https://github.com/ChorusCore/"
       )
