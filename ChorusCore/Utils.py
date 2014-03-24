@@ -270,11 +270,14 @@ def extract_str(rawstr, start, end):
     
 def parse_description(description):
     desp = []
-    lines = description.split("\n")
-    for line in lines:
-        line = line.strip()
-        if line:
-            key = extract_str(line, "[", "]")
-            value = line[line.find("]")+1:].strip()
-            desp.append([key,value])
-    return desp
+    try:
+        lines = description.split("\n")
+        for line in lines:
+            line = line.strip()
+            if line:
+                key = extract_str(line, "[", "]")
+                value = line[line.find("]")+1:].strip()
+                desp.append([key,value])
+        return desp
+    except Exception:
+        return []

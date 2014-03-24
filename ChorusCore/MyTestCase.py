@@ -157,21 +157,6 @@ class MyTestCase(unittest.TestCase):
         cls.suite_endtime = time.time()
         cls.result.time_taken = cls.suite_endtime - cls.suite_starttime
     
-    def parse_description(self, description):
-        desp = []
-        try:
-            lines = description.split("\n")
-            for line in lines:
-                line = line.strip()
-                if line:
-                    key = Utils.extract_str(line, "[", "]")
-                    value = line[line.find("]")+1:].strip()
-                    desp.append([key,value])
-            return desp
-        except Exception,e:
-            self.logger.warning("Cannot parse description for case %s with error %s:%s" % (self._testMethodName,str(Exception),str(e)))
-            return []
-    
     def parse_unittest_assertionerror(self):
         try:
             error_message = self._resultForDoCleanups.failures[0][1]
