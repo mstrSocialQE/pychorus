@@ -159,14 +159,18 @@ class MyTestCase(unittest.TestCase):
     
     def parse_description(self, description):
         desp = []
-        lines = description.split("\n")
-        for line in lines:
-            line = line.strip()
-            if line:
-                key = Utils.extract_str(line, "[", "]")
-                value = line[line.find("]")+1:].strip()
-                desp.append([key,value])
-        return desp
+        try:
+            lines = description.split("\n")
+            for line in lines:
+                line = line.strip()
+                if line:
+                    key = Utils.extract_str(line, "[", "]")
+                    value = line[line.find("]")+1:].strip()
+                    desp.append([key,value])
+            return desp
+        except Exception,e:
+            self.logger.warning("Cannot parse description for case %s with error %s:%s" % (self._testMethodName,str(Exception),str(e)))
+            return []
     
     def parse_unittest_assertionerror(self):
         try:
