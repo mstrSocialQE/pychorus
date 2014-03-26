@@ -141,7 +141,7 @@ class Request:
                 body = self.body
         else:
             if self.mode == RequestMode.www_form:
-                body = urllib.urlencode(body)
+                body = urllib.urlencode(self.body)
             elif self.mode == RequestMode.multi_form:
                 boundary = Utils.get_random_str(16)
                 body = self.encode_multipart_formdata(boundary)
