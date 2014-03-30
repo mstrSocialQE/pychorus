@@ -160,7 +160,7 @@ class MyTestCase(unittest.TestCase):
     def parse_unittest_assertionerror(self):
         try:
             error_message = self._resultForDoCleanups.failures[0][1]
-            error_type, error_content, error_line_info = Utls.parse_error(error_message)
+            error_type, error_content, error_line_info = Utils.parse_error(error_message)
             self.result.cases[self._testMethodName].status = ResultStatus.FAILED
             self.result.cases[self._testMethodName].statusflag = False
             self.result.statusflag = False
@@ -179,7 +179,7 @@ class MyTestCase(unittest.TestCase):
     def parse_crasherror(self):
         try:
             error_message = self._resultForDoCleanups.errors[0][1]
-            error_type, error_content, error_line_info = Utls.parse_error(error_message)
+            error_type, error_content, error_line_info = Utils.parse_error(error_message)
             self.result.cases[self._testMethodName].status = ResultStatus.CRASHED
             self.result.cases[self._testMethodName].statusflag = False
             self.result.status = ResultStatus.CRASHED
