@@ -18,6 +18,9 @@
 			<hr width="1200" align="center" size="1" />
 		<a>Started by: <b>{{ci.startuser}}</b> | Start Time:<b>{{ci.starttime}}</b> | Duration: <b>{{result.time_taken}}</b></a>
 		<br /><a>Test Scope: <b>{{result.scope_info}}</b> | Test machine: <b>{{ci.machine_name}}</b></a>
+		<br />{% for parameter in ci.parameters %}
+		<a>parameter.name<b>parameter.value</b></a>
+		{% endfor %}
 		<br />
 		<b><a href={{ci.htmllink}}>html report</a></b>|<b><a href={{ci.consolelink}}>console</a></b>
 		<br />

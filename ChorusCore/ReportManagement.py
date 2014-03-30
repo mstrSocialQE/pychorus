@@ -65,6 +65,8 @@ class ReportManagement:
                             self.ciresult.startuser = self.ciresult.startuser.split("Started by user ")[1]
                         else:
                             self.ciresult.startuser = self.ciresult.startuser.split("Started by ")[1]
+                    if action.has_key("parameters"):
+                        self.ciresult.parameters = action["parameters"]
                     self.ciresult.starttime = datetime.datetime.fromtimestamp(float(resp['timestamp'])/1000).strftime('%Y-%m-%d %H:%M:%S')
                     self.ciresult.job = resp["fullDisplayName"]
                     self.ciresult.htmllink = self.ciresult.joblink+"HTML_Report"
@@ -151,9 +153,10 @@ class CIReport:
         self.machine_name = ""
         self.suites={}
         self.logger = ChorusGlobals.get_logger()
+        self.parameters = {}
         
     def call_url(self):
-        url = "%sapi/json?tree=timestamp,url,duration,fullDisplayName,result,actions[causes[shortDescription]]" % self.joblink
+        url = "%sapi/json" % self.joblink
         try:
             request = urllib2.Request(url,None)
             response = urllib2.urlopen(request)
