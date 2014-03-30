@@ -57,7 +57,7 @@
 			</table>
 			<br />
 		{% endif %}
-		{% if result.status=="Failed"%}
+		{% if not result.statusflag %}
 			<h2 style="color:red">Failure list</h2>
 			<hr width="1200" align="center" size="1" />
 			<table cellpadding="5" class="details" cellspacing="2" border="0" width="1200" style="color:red">
