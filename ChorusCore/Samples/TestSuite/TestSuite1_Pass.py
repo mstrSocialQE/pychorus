@@ -16,7 +16,7 @@ class TestSuite1_Pass(MyTestCase):
         cls.picdata1 = cls.picture1.read()
         cls.picture2 = open(Utils.get_filestr(["TestData"], "test_photo1.png"),"r")
         cls.picdata2 = cls.picture2.read()
-#        abc
+
     def setUp(self):  
         '''scripts before each cases'''
         MyTestCase.setUp(self)   
