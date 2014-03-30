@@ -11,12 +11,12 @@ class TestSuite1_Pass(MyTestCase):
     @classmethod
     def setUpClass(cls):
         '''Add prepare scripts before all cases'''
+        super(TestSuite1_Pass,cls).setUpClass()
         cls.picture1 = open(Utils.get_filestr(["TestData"], "test_photo.png"),"r")
         cls.picdata1 = cls.picture1.read()
         cls.picture2 = open(Utils.get_filestr(["TestData"], "test_photo1.png"),"r")
         cls.picdata2 = cls.picture2.read()
-        super(TestSuite1_Pass,cls).setUpClass()
-        
+#        abc
     def setUp(self):  
         '''scripts before each cases'''
         MyTestCase.setUp(self)   

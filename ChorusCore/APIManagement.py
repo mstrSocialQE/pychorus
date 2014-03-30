@@ -34,7 +34,8 @@ class Request:
                  base_url = None,
                  follow_redirects = True,
                  mode = None,
-                 upload_files = {}):
+                 upload_files = {},
+                 credentials = None):
         self.logger = ChorusGlobals.get_logger()
         if base_url:
             base_url = base_url
@@ -86,6 +87,7 @@ class Request:
         else:
             self.mode = None
         self.upload_files = upload_files
+        self.credentials = credentials
     
     def set_request_mode(self, header_mode):
         self.headers["content-type"] = header_mode
@@ -218,7 +220,9 @@ class Request:
                 http = httplib2.Http(disable_ssl_certificate_validation=True)
             if self.cert and self.key:
                 http.add_certificate(self.key, self.cert, self.cert_domain)
-            
+            if self.credentials:
+                http.add_credentials(self.credentials["name"], self.credentials["password"], 
+                                     self.credentials["domain"])
                 
             http.follow_redirects=self.follow_redirects
             starttime = time.time()

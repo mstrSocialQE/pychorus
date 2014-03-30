@@ -52,10 +52,34 @@ class TestSuiteManagement:
                 self.baselinepath.append(path)
         ChorusGlobals.set_baselinepath(self.baselinepath)
     
+    def parse_crashed_suite(self, suitename, unittest_result):
+        try:
+            error_message = unittest_result.errors[0][1]
+            error_type, error_content, error_line_info = Utils.parse_error(error_message)
+            self.result.suites[suitename].status = ResultStatus.CRASHED
+            for case_name, case_result in self.result.suites[suitename].cases.items():
+                case_result.status = ResultStatus.NOT_STARTED
+                case_result.statusflag = False
+            self.result.suites[suitename].statusflag = False
+            self.result.suites[suitename].unknownflag = True
+            self.result.statusflag = False
+            self.result.unknownflag = True
+            self.result.status = ResultStatus.CRASHED
+            self.result.suites[suitename].fail_message={"type":error_type,
+                                                        "content":error_content,
+                                                        "line_info":error_line_info}
+            self.logger.error("CrashError: "+" - ".join([error_type, error_content, error_line_info]))
+            unittest_result.errors = []
+        except Exception, e:
+            self.logger.critical("parsing crash error failed by errors '%s'" % str(e))
+    
     def execute_suites(self):
         start_time = time.time()
         for suite in self.suites_in_scope._tests:
-            self.runner.append(unittest.TextTestRunner(verbosity=2).run(suite))
+            unittest_result = unittest.TextTestRunner(verbosity=2).run(suite)
+            self.runner.append(unittest_result)
+            if unittest_result.errors:
+                self.parse_crashed_suite(suite.name, unittest_result)
         end_time = time.time()
         self.result.time_taken = end_time - start_time
         for suite_result in self.result.suites:
@@ -85,6 +109,7 @@ class TestSuiteManagement:
             for class_name, class_obj in suite_classes:
                 if class_name == suite_name:
                     suite = unittest.TestSuite(map(class_obj,case_list))
+                    suite.name = suite_name
                     suite_in_scope = self.check_suite_scope(suite, suite_name)
                     if suite_in_scope:
                         self.suites_in_scope.addTest(suite_in_scope)

@@ -160,7 +160,7 @@ class MyTestCase(unittest.TestCase):
     def parse_unittest_assertionerror(self):
         try:
             error_message = self._resultForDoCleanups.failures[0][1]
-            error_type, error_content, error_line_info = self.parse_error(error_message)
+            error_type, error_content, error_line_info = Utls.parse_error(error_message)
             self.result.cases[self._testMethodName].status = ResultStatus.FAILED
             self.result.cases[self._testMethodName].statusflag = False
             self.result.statusflag = False
@@ -174,12 +174,12 @@ class MyTestCase(unittest.TestCase):
             self.logger.error("AssertionError: "+" - ".join([error_type, error_content, error_line_info]))
             self._resultForDoCleanups.failures = []
         except Exception, e:
-            self.logger.critical("parsing assertion error failed by errors '%s'" % e)
+            self.logger.critical("parsing assertion error failed by errors '%s'" % str(e))
             
     def parse_crasherror(self):
         try:
             error_message = self._resultForDoCleanups.errors[0][1]
-            error_type, error_content, error_line_info = self.parse_error(error_message)
+            error_type, error_content, error_line_info = Utls.parse_error(error_message)
             self.result.cases[self._testMethodName].status = ResultStatus.CRASHED
             self.result.cases[self._testMethodName].statusflag = False
             self.result.status = ResultStatus.CRASHED
@@ -192,12 +192,4 @@ class MyTestCase(unittest.TestCase):
             self.logger.critical("CrashError: "+" - ".join([error_type, error_content, error_line_info]))
             self._resultForDoCleanups.errors = []
         except Exception, e:
-            self.logger.critical("parsing crash error failed by errors '%s'" % e)
-    
-    def parse_error(self, msg):
-        temp_msgs = msg.strip().split("\n")
-        temp_msgs2 = temp_msgs[-1].split(":")
-        error_type = temp_msgs2[0].strip()
-        error_content = temp_msgs2[1].strip()
-        error_line_info = "\n"+"\n".join(temp_msgs[1:-1]).strip()
-        return error_type, error_content, error_line_info
+            self.logger.critical("parsing crash error failed by errors '%s'" % str(e))

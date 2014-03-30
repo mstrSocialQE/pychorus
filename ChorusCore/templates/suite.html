@@ -110,6 +110,21 @@
 	        <ul class="filetree treeview-famfamfam" id="browser">
             	<ul>
 	                <li>
+	                	{% if result.fail_message %}
+		                	<span class="red"><b>Error Happens as below</b></span>
+	                		<table class="table" width="80%" border="1">
+	                            <tr>
+	                                <th width=20%>Type</th>
+									<th width=20%>Content</th>
+									<th width=60%>Info</th>
+	                            </tr>
+	                            <tr>
+	                                <td width=20%><font color="red"><b>{{ result.fail_message.type }}</b></font></td>
+	                                <td width=20%>{{ result.fail_message.content }}</td>
+	                                <td width=60%>{{ result.fail_message.line_info }}</td>
+	                            </tr>        			
+		                	</table>
+		                {% endif %}
 	                    <table class="table" width=500px>
 	                    	<tr>
 	                    		<th width=50%>Case Name</th>
@@ -121,7 +136,7 @@
 	                            <th width=50%>
                                     <a href=#{{case_result.name}}>{{ case_result.name }}</a>
 	                			</th>
-		                        {% if case_result.status=="Failed" or case_result.status=="Crashed" %}
+		                        {% if not case_result.statusflag %}
                                     <th class="red" width=20%>{{ case_result.status }}</th>
                                 {% else %}
                                     <th class="green" width=20%>{{ case_result.status }}</th>
@@ -140,7 +155,7 @@
 	            </ul>
 		            {% for case_name,case_result in result.cases.iteritems() %}
 		            <h3 class="blue"><a name={{case_result.name}}>{{ case_result.name }}</a>
-		            	{% if case_result.status=="Failed" or case_result.status=="Crashed" %}
+		            	{% if not case_result.statusflag %}
                         	<a class="red">  - {{ case_result.status }}</a>
                         {% else %}
                             <a class="green">  - {{ case_result.status }}</a>
@@ -179,7 +194,7 @@
 		                    <span class="l"> </span>
 		                    <span class="r"> </span>
 		                    <div class="hide">
-		                    	{% if cp.status=="Failed" or cp.status=="Crashed" %}
+		                    	{% if not cp.statusflag %}
                                 <span class="red">{{ cp.status }}</span>
                                 {% else %}
                                 <span class="green">{{ cp.status }}</span>

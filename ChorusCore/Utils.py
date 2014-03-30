@@ -267,7 +267,15 @@ def extract_str(rawstr, start, end):
         return newstr
     except Exception:
         return ""
-    
+
+def parse_error(msg):
+    temp_msgs = msg.strip().split("\n")
+    temp_msgs2 = temp_msgs[-1].split(":")
+    error_type = temp_msgs2[0].strip()
+    error_content = temp_msgs2[1].strip()
+    error_line_info = "\n"+"\n".join(temp_msgs[1:-1]).strip()
+    return error_type, error_content, error_line_info
+
 def parse_description(description):
     desp = []
     try:
