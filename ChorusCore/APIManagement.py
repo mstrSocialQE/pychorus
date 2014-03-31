@@ -3,7 +3,7 @@ Created on May 13, 2013
 
 @author: mxu, modified by Anduril
 '''
-import httplib2, urllib, json
+import httplib2, urllib, json,time
 import Utils
 import copy,os
 import importlib
@@ -34,7 +34,8 @@ class Request:
                  base_url = None,
                  follow_redirects = True,
                  mode = None,
-                 upload_files = {}):
+                 upload_files = {},
+                 credentials = None):
         self.logger = ChorusGlobals.get_logger()
         if base_url:
             base_url = base_url
@@ -86,6 +87,7 @@ class Request:
         else:
             self.mode = None
         self.upload_files = upload_files
+        self.credentials = credentials
     
     def set_request_mode(self, header_mode):
         self.headers["content-type"] = header_mode
@@ -141,7 +143,7 @@ class Request:
                 body = self.body
         else:
             if self.mode == RequestMode.www_form:
-                body = urllib.urlencode(body)
+                body = urllib.urlencode(self.body)
             elif self.mode == RequestMode.multi_form:
                 boundary = Utils.get_random_str(16)
                 body = self.encode_multipart_formdata(boundary)
@@ -218,17 +220,22 @@ class Request:
                 http = httplib2.Http(disable_ssl_certificate_validation=True)
             if self.cert and self.key:
                 http.add_certificate(self.key, self.cert, self.cert_domain)
-            
+            if self.credentials:
+                http.add_credentials(self.credentials["name"], self.credentials["password"], 
+                                     self.credentials["domain"])
                 
             http.follow_redirects=self.follow_redirects
+            starttime = time.time()
             resp, content = http.request(url,
                                      self.method.upper(),
                                      headers = self.headers,
                                      body = body                                 
                                      )
+            endtime = time.time()
+            self.time_taken = endtime-starttime
         except Exception, e:
-            self.logger.critical("Cannot connect %s" % (self.url,str(e)))
-            raise Exception("Cannot connect %s" % (self.url,str(e)))
+            self.logger.critical("Call %s exception %s:%s" % (self.url,str(Exception),str(e)))
+            raise Exception("Call %s exception %s:%s" % (self.url,str(Exception),str(e)))
             
         try:
             content_dict = Utils.get_dict_from_json(content)

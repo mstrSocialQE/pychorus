@@ -13,7 +13,7 @@ from ReportManagement import ReportManagement
 class RunTest:
     result = []
     def __init__(self):
-        self.currunname=Utils.get_timestamp()
+#        self.currunname=Utils.get_timestamp()
         self.init_testsuite()
         self.run_testsuite()
         self.generate_report()
@@ -29,4 +29,5 @@ class RunTest:
     def generate_report(self):
         self.rm = ReportManagement()
         self.rm.generate_html()
+        self.rm.generate_console_report()
         

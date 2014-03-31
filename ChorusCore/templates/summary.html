@@ -39,7 +39,7 @@
 		                            <th width=50%>
                                         <a href={{suite_result.name}}.html>{{ suite_result.name }}</a>
 		                			</th>
-			                        {% if suite_result.status=="Failed" or suite_result.status=="Crashed" %}
+			                        {% if not suite_result.statusflag %}
 	                                    <th class="red" width=20%>{{ suite_result.status }}</th>
 	                                {% else %}
 	                                    <th class="green" width=20%>{{ suite_result.status }}</th>

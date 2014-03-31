@@ -18,8 +18,11 @@
 			<hr width="1200" align="center" size="1" />
 		<a>Started by: <b>{{ci.startuser}}</b> | Start Time:<b>{{ci.starttime}}</b> | Duration: <b>{{result.time_taken}}</b></a>
 		<br /><a>Test Scope: <b>{{result.scope_info}}</b> | Test machine: <b>{{ci.machine_name}}</b></a>
-		<br />
-		<b><a href={{ci.htmllink}}>html report</a></b>|<b><a href={{ci.consolelink}}>console</a></b>
+		<br /><a><b>Environment Parameters: </b></a>
+		{% for parameter in ci.parameters %}
+		<a>({{parameter.name}}: <b>{{parameter.value}})</b></a>
+		{% endfor %}
+		<br /><b><a href={{ci.htmllink}}>html report</a></b>|<b><a href={{ci.consolelink}}>console</a></b>
 		<br />
 		{% if result.unknownflag%}
 			<h2 style="color:red">Code Break list</h2>
@@ -34,11 +37,18 @@
 					<th width=45%>Error Line Info</th>
 				</tr>
 				{% for suite_name,suite_result in result.suites.iteritems() %}
+				{% if suite_result.fail_message %}
+					<td width=15%><a href="{{ci.suites[suite_name].link}}">{{suite_name}}</a></td>
+					<td width=15%>SetupClass</td>
+					<td width=10%>{{suite_result.fail_message.type}}</td>
+					<td width=15%>{{suite_result.fail_message.content}}</td>
+					<td width=45%>{{suite_result.fail_message.line_info}}</td>
+				{% endif %}
 				{% for case_name, case_result in suite_result.cases.iteritems() %}
 				{% if case_result.fail_message %}
 				<tr>
-					<td width=15%>{{suite_name}}</td>
-					<td width=15%>{{case_name}}</td>
+					<td width=15%><a href=#{{suite_name}}>{{suite_name}}</a></td>
+					<td width=15%><a href="{{ci.suites[suite_name].link}}#{{case_name}}">{{case_name}}</a></td>
 					<td width=10%>{{case_result.fail_message.type}}</td>
 					<td width=15%>{{case_result.fail_message.content}}</td>
 					<td width=45%>{{case_result.fail_message.line_info}}</td>
@@ -50,7 +60,7 @@
 			</table>
 			<br />
 		{% endif %}
-		{% if result.status=="Failed"%}
+		{% if not result.statusflag %}
 			<h2 style="color:red">Failure list</h2>
 			<hr width="1200" align="center" size="1" />
 			<table cellpadding="5" class="details" cellspacing="2" border="0" width="1200" style="color:red">
@@ -65,8 +75,8 @@
 				{% for assertion_name, assertion_result in case_result.assertions.iteritems() %}
 				{% if assertion_result.status=="Failed" %}
 				<tr>
-					<td width=33%>{{suite_name}}</td>
-					<td width=33%>{{case_name}}</td>
+					<td width=33%><a href=#{{suite_name}}>{{suite_name}}</a></td>
+					<td width=33%><a href="{{ci.suites[suite_name].link}}#{{case_name}}">{{case_name}}</a></td>
 					<td width=34%>{{assertion_name}}</td>
 				</tr>
 				{% endif %}
@@ -93,8 +103,8 @@
 				{% for assertion_name, assertion_result in case_result.assertions.iteritems() %}
 				{% if assertion_result.status=="Passed with known issues" %}
 				<tr>
-					<td width=20% style="color:red">{{suite_name}}</td>
-					<td width=20% style="color:red">{{case_name}}</td>
+					<td width=20% style="color:red"><a href=#{{suite_name}}>{{suite_name}}</a></td>
+					<td width=20% style="color:red"><a href="{{ci.suites[suite_name].link}}#{{case_name}}">{{case_name}}</a></td>
 					<td width=20% style="color:red">{{assertion_name}}</td>
 					<td width=40% style="color:red">{{assertion_result.comments}}</td>
 				</tr>

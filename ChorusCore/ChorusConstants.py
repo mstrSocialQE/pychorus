@@ -18,6 +18,7 @@ class ResultStatus:
     FAILED = "Failed"
     KNOWN_ISSUES = "Passed with known issues"
     CRASHED = "Crashed"
+    NOT_STARTED = "Not_Started"
     
 class LOGIC:
     Equal = 'Equal'
@@ -76,7 +77,9 @@ class SuiteResult:
         self.status = ResultStatus.PASSED
         self.statusflag = True
         self.unknownflag = False
-    
+        self.description = ""
+        self.fail_message = {}
+        
 class CaseResult:
     def __init__(self,name):
         self.name = name
@@ -89,6 +92,7 @@ class CaseResult:
         self.time_taken = 0
         self.status = ResultStatus.PASSED
         self.statusflag = True
+        self.description = ""
     
 class AssertionResult:
     def __init__(self,name):

@@ -7,6 +7,7 @@ Created on Feb 23, 2014
 import unittest,time,json
 import Utils
 import ChorusGlobals
+from PerformanceManagement import Performance_Result
 from ChorusConstants import LEVELS, LOGIC, IMAGELOGIC, TYPES, ResultStatus, AssertionResult
 
 class MyTestCase(unittest.TestCase):
@@ -47,7 +48,7 @@ class MyTestCase(unittest.TestCase):
         assertion_result.baseline_status = True
         self.vm.checkpoint(self, name, data2, level = levels, cptype = TYPES.Data, logic = LOGIC.Equal)
     
-    def assertHTTPResponse(self, name, response, levels = LEVELS.Normal, logic = LOGIC.Equal):
+    def assertHTTPResponse(self, name, response, levels = LEVELS.Normal, logic = LOGIC.Equal, add_performance = True):
         assertion_result = self.init_assertions(name)
         try:
             api = json.dumps({
@@ -58,7 +59,8 @@ class MyTestCase(unittest.TestCase):
                                 "request_body":  response.body,
                                 "response_headers": response.response.headers,
                                 "response_body": response.response.data,
-                                "response_status": response.response.status
+                                "response_status": response.response.status,
+                                "time_taken": response.time_taken
                                 })
         except Exception,e:
             message = "Cannot transfer api info to json, please change it before assertion with error: %s" % str(e)
@@ -68,8 +70,10 @@ class MyTestCase(unittest.TestCase):
                                     "url":response.response.url,
                                     "api":api
                                     }
+        if add_performance:
+            Performance_Result().add(response.url, response.response.status, api, response.time_taken)
         self.vm.checkpoint(self, name, response.result, level = levels, cptype = TYPES.HTTPResponse, logic = logic)
-    
+
     def assertImageData(self, name, imagedata, levels = LEVELS.Normal, image_logic = IMAGELOGIC.Full, imagetype = "jpg"):
         self.vm.save_image(self, name, imagedata, imagetype)
         content = {
@@ -108,9 +112,11 @@ class MyTestCase(unittest.TestCase):
         super(MyTestCase,cls).setUpClass()
         cls.logger = ChorusGlobals.get_logger()
         cls.suite_name = Utils.get_current_classname(cls)
+        ChorusGlobals.set_current_suitename(cls.suite_name)
         from VerificationManagement import VerificationManagement
         cls.vm = VerificationManagement()
         cls.result = cls.vm.check_suitebaseline(cls.suite_name)
+        cls.result.description = Utils.parse_description(cls.__doc__)
         cls.timestamp = Utils.get_timestamp()
         cls.config = ChorusGlobals.get_configinfo()
         cls.parameters = ChorusGlobals.get_parameters()
@@ -135,6 +141,7 @@ class MyTestCase(unittest.TestCase):
                 self.result.failed_cases += 1
             elif self.result.cases[self._testMethodName].status in [ResultStatus.PASSED, ResultStatus.KNOWN_ISSUES]:
                 self.result.passed_cases += 1
+            self.result.cases[self._testMethodName].description = Utils.parse_description(self._testMethodDoc)
         unittest.TestCase.tearDown(self)
         
     @classmethod
@@ -149,11 +156,11 @@ class MyTestCase(unittest.TestCase):
         cls.logserver.flush_console()
         cls.suite_endtime = time.time()
         cls.result.time_taken = cls.suite_endtime - cls.suite_starttime
-        
+    
     def parse_unittest_assertionerror(self):
         try:
             error_message = self._resultForDoCleanups.failures[0][1]
-            error_type, error_content, error_line_info = self.parse_error(error_message)
+            error_type, error_content, error_line_info = Utils.parse_error(error_message)
             self.result.cases[self._testMethodName].status = ResultStatus.FAILED
             self.result.cases[self._testMethodName].statusflag = False
             self.result.statusflag = False
@@ -167,12 +174,12 @@ class MyTestCase(unittest.TestCase):
             self.logger.error("AssertionError: "+" - ".join([error_type, error_content, error_line_info]))
             self._resultForDoCleanups.failures = []
         except Exception, e:
-            self.logger.critical("parsing assertion error failed by errors '%s'" % e)
+            self.logger.critical("parsing assertion error failed by errors '%s'" % str(e))
             
     def parse_crasherror(self):
         try:
             error_message = self._resultForDoCleanups.errors[0][1]
-            error_type, error_content, error_line_info = self.parse_error(error_message)
+            error_type, error_content, error_line_info = Utils.parse_error(error_message)
             self.result.cases[self._testMethodName].status = ResultStatus.CRASHED
             self.result.cases[self._testMethodName].statusflag = False
             self.result.status = ResultStatus.CRASHED
@@ -185,12 +192,4 @@ class MyTestCase(unittest.TestCase):
             self.logger.critical("CrashError: "+" - ".join([error_type, error_content, error_line_info]))
             self._resultForDoCleanups.errors = []
         except Exception, e:
-            self.logger.critical("parsing crash error failed by errors '%s'" % e)
-    
-    def parse_error(self, msg):
-        temp_msgs = msg.strip().split("\n")
-        temp_msgs2 = temp_msgs[-1].split(":")
-        error_type = temp_msgs2[0].strip()
-        error_content = temp_msgs2[1].strip()
-        error_line_info = "\n"+"\n".join(temp_msgs[1:-1]).strip()
-        return error_type, error_content, error_line_info
+            self.logger.critical("parsing crash error failed by errors '%s'" % str(e))

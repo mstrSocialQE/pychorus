@@ -93,14 +93,14 @@ def copy_folder(src, dst):
                 shutil.copy(src, dst)
             else: raise
 
-def read_config(config_filename,config_filepath):
+def read_config(config_file):
     '''Read cfg file'''
     cfg = ConfigParser.RawConfigParser()
-    print "Set config file to %s/%s" % (config_filepath,config_filename)
-    paths = config_filepath.split("/")
-    cfg.read(get_filestr(paths, config_filename))
+    cfg.read(config_file)
     if not cfg.sections():
-        raise Exception("Cannot read config info from %s at %s, please check you config filename and path!" % (config_filename,config_filepath))
+        raise Exception("Cannot read config info from %s at %s, please check you configfile!" % config_file)
+    else:
+        print "Set config file to %s" % config_file
     return cfg
 
 def get_timestamp():
@@ -258,3 +258,34 @@ def get_parameters(*args):
 def get_random_str(length = 16):
     import string
     return ''.join(random.sample(string.ascii_letters+string.digits,length))
+
+def extract_str(rawstr, start, end):
+    try:
+        temp1=rawstr.split(start)
+        temp2=temp1[1].split(end)
+        newstr=temp2[0]
+        return newstr
+    except Exception:
+        return ""
+
+def parse_error(msg):
+    temp_msgs = msg.strip().split("\n")
+    temp_msgs2 = temp_msgs[-1].split(":")
+    error_type = temp_msgs2[0].strip()
+    error_content = temp_msgs2[1].strip()
+    error_line_info = "\n"+"\n".join(temp_msgs[1:-1]).strip()
+    return error_type, error_content, error_line_info
+
+def parse_description(description):
+    desp = []
+    try:
+        lines = description.split("\n")
+        for line in lines:
+            line = line.strip()
+            if line:
+                key = extract_str(line, "[", "]")
+                value = line[line.find("]")+1:].strip()
+                desp.append([key,value])
+        return desp
+    except Exception:
+        return []
