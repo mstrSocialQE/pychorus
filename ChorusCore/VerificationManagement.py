@@ -62,6 +62,7 @@ class VerificationManagement:
             output_path.remove("")
         output_path.append(suite_name)
         self.suite_output_path = output_path
+        self.suite_name = suite_name
         return self.result.suites[suite_name]
     
     def generate_baseline(self,result):
@@ -171,10 +172,10 @@ class VerificationManagement:
         self.make_thumbfile(im_base, base_thumbfilename)
         self.make_thumbfile(im_real, real_thumbfilename)
         assertion_result.detail = {
-                                    "basethumb": base_thumbfilename,
-                                    "basevalue": base_filename,
-                                    "realthumb": real_thumbfilename,
-                                    "realvalue": real_filename
+                                    "basethumb": os.path.join(self.suite_name, content["image_name"]+"_base"+"_thumbnail"+"."+content["image_type"]),
+                                    "basevalue": os.path.join(self.suite_name, content["image_name"]+"_base"+"."+content["image_type"]),
+                                    "realthumb": os.path.join(self.suite_name, content["image_name"]+"_real"+"_thumbnail"+"."+content["image_type"]),
+                                    "realvalue": os.path.join(self.suite_name, content["image_name"]+"_real"+"."+content["image_type"])
                                    }
         if assertion_result.similarity < assertion_result.logic:
             assertion_result.status = ResultStatus.FAILED
@@ -184,8 +185,8 @@ class VerificationManagement:
             im_diff = Image.open(diff_filename)
             diff_thumbfilename = Utils.get_filestr(self.suite_output_path,content["image_name"]+"_diff"+"_thumbnail"+"."+content["image_type"])
             self.make_thumbfile(im_diff, diff_thumbfilename)
-            assertion_result.detail["diffthumb"] = diff_thumbfilename
-            assertion_result.detail["diffvalue"] = diff_filename
+            assertion_result.detail["diffthumb"] = os.path.join(self.suite_name, content["image_name"]+"_diff"+"_thumbnail"+"."+content["image_type"])
+            assertion_result.detail["diffvalue"] = os.path.join(self.suite_name, content["image_name"]+"_diff"+"."+content["image_type"])
     
     def special_compare(self, assertion_result):
         if assertion_result.logic == 'UnEqual' and assertion_result.baseline == assertion_result.current:
