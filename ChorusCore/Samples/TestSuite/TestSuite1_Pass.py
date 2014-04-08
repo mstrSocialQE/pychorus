@@ -50,7 +50,7 @@ class TestSuite1_Pass(MyTestCase):
         self.assertTrue(True, "Break_Message_for_unitteset_assertTrue")
         self.assertEqual("A01_data","A01_data","Break_Message_for_unittest_assertEqual")
         from ChorusCore.APIManagement import Request
-        api = Request(url = "data/cityinfo/101010100.html", method = "get", base_url = "http://www.weather.com.cn").send()
+        api = Request(url = "data/cityinfo/101010100.html", method = "get", base_url = "http://www.weather.com.cn", ea_flag = True).send()
         self.assertHTTPResponse("A04_HttpCompare_With_Baseline", api)
         
     @TestScope.setscope(TestScope.Scope.Regression)

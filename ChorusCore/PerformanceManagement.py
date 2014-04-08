@@ -18,8 +18,7 @@ class Performance_Object:
 class Performance_Result:
     data = []
     number = 0
+    @classmethod
     def add(self, name, status, detail, time_taken):
         self.data.append(Performance_Object(name, status, detail, time_taken))
         self.number += 1
-    
-    
