@@ -12,9 +12,9 @@ class TestSuite1_Pass(MyTestCase):
     def setUpClass(cls):
         '''Add prepare scripts before all cases'''
         super(TestSuite1_Pass,cls).setUpClass()
-        cls.picture1 = open(Utils.get_filestr(["TestData"], "test_photo.png"),"r")
+        cls.picture1 = open(Utils.get_filestr(["TestData"], "test_photo.png"),"rb")
         cls.picdata1 = cls.picture1.read()
-        cls.picture2 = open(Utils.get_filestr(["TestData"], "test_photo1.png"),"r")
+        cls.picture2 = open(Utils.get_filestr(["TestData"], "test_photo1.png"),"rb")
         cls.picdata2 = cls.picture2.read()
 
     def setUp(self):  
