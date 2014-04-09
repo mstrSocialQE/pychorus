@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
         name = "ChorusCore",
-        version = "0.9.018",
+        version = "0.9.020",
         description = "A test framework based on unittest, support baselines assertion, give pretty html report",
         author = "Anduril, mxu",
         author_email = "yjckralunr@gmail.com",

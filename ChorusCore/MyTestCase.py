@@ -41,37 +41,19 @@ class MyTestCase(unittest.TestCase):
     def assertData(self, name, content, levels = LEVELS.Normal):
         self.vm.checkpoint(self, name, content, level = levels, cptype = TYPES.Data, logic = LOGIC.Equal)
     
-    def assertDataOnFly(self, name, data1, data2, levels = LEVELS.Normal):
+    def assertDataOnFly(self, name, data1, data2, levels = LEVELS.Normal, cptype = TYPES.Data):
         assertion_result = self.init_assertions(name)
         assertion_result.onfly_flag = True
         assertion_result.baseline = data1
         assertion_result.baseline_status = True
-        self.vm.checkpoint(self, name, data2, level = levels, cptype = TYPES.Data, logic = LOGIC.Equal)
+        self.vm.checkpoint(self, name, data2, level = levels, cptype = cptype, logic = LOGIC.Equal)
     
-    def assertHTTPResponse(self, name, response, levels = LEVELS.Normal, logic = LOGIC.Equal, add_performance = True):
+    def assertHTTPResponse(self, name, response, levels = LEVELS.Normal, logic = LOGIC.Equal):
         assertion_result = self.init_assertions(name)
-        try:
-            api = json.dumps({
-                                "url": response.response.url,
-                                "method" : response.method,
-                                "request_parameters" : response.parameters,
-                                "request_headers" : response.headers,
-                                "request_body":  response.body,
-                                "response_headers": response.response.headers,
-                                "response_body": response.response.data,
-                                "response_status": response.response.status,
-                                "time_taken": response.time_taken
-                                })
-        except Exception,e:
-            message = "Cannot transfer api info to json, please change it before assertion with error: %s" % str(e)
-            self.vm.logger.warning(message)
-            api = json.dumps({"message":message})
         assertion_result.detail = {
                                     "url":response.response.url,
-                                    "api":api
-                                    }
-        if add_performance:
-            Performance_Result().add(response.url, response.response.status, api, response.time_taken)
+                                    "api":response.jsdata
+                                   }
         self.vm.checkpoint(self, name, response.result, level = levels, cptype = TYPES.HTTPResponse, logic = logic)
 
     def assertImageData(self, name, imagedata, levels = LEVELS.Normal, image_logic = IMAGELOGIC.Full, imagetype = "jpg"):

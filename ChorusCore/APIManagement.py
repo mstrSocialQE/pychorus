@@ -35,7 +35,8 @@ class Request:
                  follow_redirects = True,
                  mode = None,
                  upload_files = {},
-                 credentials = None):
+                 credentials = None,
+                 ea_flag = False):
         self.logger = ChorusGlobals.get_logger()
         if base_url:
             base_url = base_url
@@ -88,6 +89,7 @@ class Request:
             self.mode = None
         self.upload_files = upload_files
         self.credentials = credentials
+        self.ea_flag = ea_flag
     
     def set_request_mode(self, header_mode):
         self.headers["content-type"] = header_mode
@@ -208,7 +210,7 @@ class Request:
             url_for_read = self.url
             url = self.url
             
-        body = self.adjust_postbody()
+        self.realbody = self.adjust_postbody()
 
         self.logger.info(self.method.upper() + ' - ' + url)
         
@@ -229,7 +231,7 @@ class Request:
             resp, content = http.request(url,
                                      self.method.upper(),
                                      headers = self.headers,
-                                     body = body                                 
+                                     body = self.realbody                                 
                                      )
             endtime = time.time()
             self.time_taken = endtime-starttime
@@ -263,9 +265,30 @@ class Request:
             newresp[key]=resp[key]
         self.result = result
         self.response = Response(response_data = content_dict, response_header = newresp, status = ' '.join([str(resp.status), resp.reason]),url = url_for_read)
-        
+        self.jsdata = self.generate_json()
+        if self.ea_flag:
+            from PerformanceManagement import Performance_Result
+            Performance_Result.add(self.url, self.response.status, self.jsdata, self.time_taken)
         return self
-
+    
+    def generate_json(self):
+        try:
+            jsdata = json.dumps({
+                                "url": self.response.url,
+                                "method" : self.method,
+                                "request_parameters" : self.parameters,
+                                "request_headers" : self.headers,
+                                "request_body":  self.realbody,
+                                "response_headers": self.response.headers,
+                                "response_body": self.response.data,
+                                "response_status": self.response.status,
+                                "time_taken": self.time_taken
+                                })
+        except Exception,e:
+            message = "Cannot transfer api info to json, please change it before assertion with error: %s" % str(e)
+            self.logger.warning(message)
+            jsdata = json.dumps({"message":message})
+        return jsdata
  
 class Response:
     '''Provide a class to handle response'''

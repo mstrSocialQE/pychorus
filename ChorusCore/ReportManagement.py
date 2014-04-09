@@ -92,7 +92,7 @@ class ReportManagement:
     def generate_performance_result(self):
         env = Environment(loader=PackageLoader('ChorusCore', 'templates'))
         performancetemplate = env.get_template("performance.html")
-        content = performancetemplate.render({"earesult":Performance_Result()})
+        content = performancetemplate.render({"earesult":Performance_Result})
         filename = os.path.join(self.output_path, 'Performance.html')
         Utils.write_to_file(filename, content, "w+")
         self.logger.info("Performance.html generated")
@@ -137,7 +137,7 @@ class ReportManagement:
         self.logger.info("Summary.xml generated")
         if os.environ.has_key("BUILD_URL"):
             self.generate_result_email()
-        if Performance_Result().data:    
+        if Performance_Result.data:    
             self.generate_performance_result()
         
 class CIReport:
